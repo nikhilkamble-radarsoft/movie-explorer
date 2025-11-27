@@ -257,7 +257,7 @@ export default function ViewMovie() {
                     <PiMoneyFill className="text-green-400 text-2xl mx-auto mb-2" />
                     <div className="text-sm text-gray-400">Budget</div>
                     <div className="font-semibold">
-                      ${(data?.top?.productionBudget?.budget?.amount / 1000000).toFixed(1)}M
+                      ${(data?.top?.productionBudget?.budget?.amount / 1000000)?.toFixed(1)}M
                     </div>
                   </div>
                 </Col>
@@ -266,7 +266,7 @@ export default function ViewMovie() {
                     <PiTrophyFill className="text-yellow-400 text-2xl mx-auto mb-2" />
                     <div className="text-sm text-gray-400">Worldwide</div>
                     <div className="font-semibold">
-                      ${(data?.top?.worldwideGross?.total?.amount / 1000000).toFixed(0)}M
+                      ${(data?.top?.worldwideGross?.total?.amount / 1000000)?.toFixed(0)}M
                     </div>
                   </div>
                 </Col>
@@ -276,7 +276,7 @@ export default function ViewMovie() {
                     <div className="text-sm text-gray-400">Opening</div>
                     <div className="font-semibold">
                       $
-                      {(data?.top?.openingWeekendGross?.gross?.total?.amount / 1000000).toFixed(1)}
+                      {(data?.top?.openingWeekendGross?.gross?.total?.amount / 1000000)?.toFixed(1)}
                       M
                     </div>
                   </div>

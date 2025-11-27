@@ -1,5 +1,5 @@
 import { Typography, Button, Card, Row, Col, Rate, Tag, Tooltip, Spin } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import useApi from "../logic/useApi";
 import { useEffect, useState } from "react";
@@ -10,9 +10,11 @@ const { Title } = Typography;
 
 export default function Movies() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const { user } = useSelector((state) => state.auth);
   const { callApi, loading } = useApi();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || "");
   const [movies, setMovies] = useState([]);
 
 
@@ -35,13 +37,22 @@ export default function Movies() {
   useEffect(() => {
     const handler = setTimeout(() => {
       if (searchQuery) {
+        setSearchParams({ q: searchQuery });
         fetchData();
       } else {
+        setSearchParams({});
         setMovies([]);
       }
     }, 300);
     return () => clearTimeout(handler);
-  }, [searchQuery]);
+  }, [searchQuery, setSearchParams]);
+
+  useEffect(() => {
+    const queryFromUrl = searchParams.get('q');
+    if (queryFromUrl !== searchQuery) {
+      setSearchQuery(queryFromUrl || "");
+    }
+  }, [searchParams, searchQuery]);
 
   return (
     <div className="">
