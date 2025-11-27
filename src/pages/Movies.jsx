@@ -67,7 +67,10 @@ export default function Movies() {
             type="input"
             placeholder="Search for movies..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setSearchParams({ q: e.target.value });
+            }}
             prefix={<PiMagnifyingGlass color="gray" />}
             className="bg-white/10 backdrop-blur-md border-white/20 text-white placeholder-gray-400"
           />
