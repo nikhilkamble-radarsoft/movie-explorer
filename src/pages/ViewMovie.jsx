@@ -169,7 +169,7 @@ export default function ViewMovie() {
                         (
                         {(
                           data?.short?.aggregateRating?.ratingCount
-                        ).toLocaleString()}{" "}
+                        )?.toLocaleString()}{" "}
                         votes)
                       </span>
                     </div>
