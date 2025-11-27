@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useGlobalModal } from "./ModalProvider.jsx";
 import { useAxios } from "./useAxios.js";
 import { inProdMode, localStorageTokenKey } from "../utils/constants.js";
+import axios from "axios";
 
 const defaultAutoCloseTime = inProdMode ? 5 : 0;
 
@@ -11,7 +12,7 @@ export default function useApi() {
   const navigate = useNavigate();
   const navigationRef = useRef({ unauthorized: false, conflict: false }); // used to prevent multiple redirects
   const { showError, showSuccess } = useGlobalModal();
-  const axios = useAxios();
+  // const axios = useAxios();
 
   /**
    * @param {Object} options

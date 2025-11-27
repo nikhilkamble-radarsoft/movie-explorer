@@ -19,7 +19,7 @@ import {
   PiMoneyFill,
   PiTrophyFill,
   PiChatCircleFill,
-  PiArrowLeftFill
+  PiArrowLeftFill,
 } from "react-icons/pi";
 
 export default function ViewMovie() {
@@ -30,7 +30,7 @@ export default function ViewMovie() {
 
   const fetchData = async () => {
     const { response, status } = await callApi({
-      url: "/search",
+      url: "/api/search",
       method: "get",
       params: {
         tt: id,
@@ -40,7 +40,7 @@ export default function ViewMovie() {
     if (status && response.ok) {
       setData(response);
     }
-  }
+  };
 
   useEffect(() => {
     if (id) {
@@ -77,7 +77,7 @@ export default function ViewMovie() {
         <div
           className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{
-            backgroundImage: `url(${data?.main?.primaryImage?.url || data?.short?.image})`
+            backgroundImage: `url(${data?.top?.primaryImage?.url || data?.short?.image})`,
           }}
         />
 
@@ -97,29 +97,30 @@ export default function ViewMovie() {
         <div className="relative z-10 px-6 pb-8">
           <div className="max-w-7xl mx-auto">
             <Title level={1} className="text-white mb-4 text-5xl font-bold">
-              {data?.short?.name || data?.main?.titleText?.text}
+              {data?.short?.name || data?.top?.titleText?.text}
             </Title>
 
             <div className="flex flex-wrap items-center gap-4 text-white/80">
               <span className="flex items-center gap-2">
                 <PiCalendarFill className="text-yellow-400" />
-                {data?.main?.releaseYear?.year || new Date(data?.short?.datePublished).getFullYear()}
+                {
+                  new Date(data?.short?.datePublished).getFullYear()}
               </span>
               <span className="flex items-center gap-2">
                 <PiClockFill className="text-yellow-400" />
-                {data?.main?.runtime?.displayableProperty?.value?.plainText || '2h 1m'}
+                {data?.top?.runtime?.displayableProperty?.value?.plainText}
               </span>
               <span className="flex items-center gap-2">
                 <PiGlobeFill className="text-yellow-400" />
-                {data?.main?.certificate?.rating || data?.short?.contentRating || 'PG-13'}
+                {data?.short?.contentRating}
               </span>
             </div>
 
             {/* Genres */}
             <div className="flex flex-wrap gap-2 mt-4">
-              {(data?.main?.genres?.genres || data?.short?.genre || []).map((genre, index) => (
+              {(data?.top?.genres?.genres || data?.short?.genre || []).map((genre, index) => (
                 <Tag key={index} className="bg-purple-600 text-white border-none">
-                  {typeof genre === 'string' ? genre : genre.text}
+                  {typeof genre === "string" ? genre : genre.text}
                 </Tag>
               ))}
             </div>
@@ -137,20 +138,22 @@ export default function ViewMovie() {
               <Row gutter={[24, 24]}>
                 <Col xs={24} md={8}>
                   <img
-                    src={data?.main?.primaryImage?.url || data?.short?.image}
+                    src={data?.short?.image || data?.top?.primaryImage?.url}
                     alt={data?.short?.name}
                     className="w-full rounded-lg shadow-2xl"
                     onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/300x450?text=No+Image';
+                      e.target.src = "https://via.placeholder.com/300x450?text=No+Image";
                     }}
                   />
                 </Col>
 
                 <Col xs={24} md={16}>
                   <div className="text-white">
-                    <Title level={3} className="text-white mb-4">Overview</Title>
+                    <Title level={3} className="text-white mb-4">
+                      Overview
+                    </Title>
                     <Paragraph className="text-gray-300 text-lg leading-relaxed">
-                      {data?.short?.description || data?.main?.plot?.plotText?.plainText}
+                      {data?.short?.description}
                     </Paragraph>
 
                     {/* Rating */}
@@ -158,12 +161,16 @@ export default function ViewMovie() {
                       <div className="flex items-center gap-2">
                         <PiStarFill className="text-yellow-400 text-2xl" />
                         <span className="text-2xl font-bold text-white">
-                          {data?.short?.aggregateRating?.ratingValue || data?.main?.ratingsSummary?.aggregateRating || '7.4'}
+                          {data?.short?.aggregateRating?.ratingValue}
                         </span>
                         <span className="text-gray-400">/10</span>
                       </div>
                       <span className="text-gray-400">
-                        ({(data?.short?.aggregateRating?.ratingCount || data?.main?.ratingsSummary?.voteCount || 947095).toLocaleString()} votes)
+                        (
+                        {(
+                          data?.short?.aggregateRating?.ratingCount
+                        ).toLocaleString()}{" "}
+                        votes)
                       </span>
                     </div>
 
@@ -174,7 +181,12 @@ export default function ViewMovie() {
                         size="large"
                         icon={<PiPlayCircleFill />}
                         className="bg-purple-600 hover:bg-purple-700 border-none"
-                        onClick={() => window.open(data?.short?.url || `https://www.imdb.com/title/${id}/`, '_blank')}
+                        onClick={() =>
+                          window.open(
+                            data?.short?.url || `https://www.imdb.com/title/${data?.imdbId}/`,
+                            "_blank"
+                          )
+                        }
                       >
                         Watch Trailer
                       </Button>
@@ -186,15 +198,20 @@ export default function ViewMovie() {
 
             {/* Cast & Crew */}
             <Card className="bg-white/10 backdrop-blur-md border-white/20 mb-6">
-              <Title level={3} className="text-white mb-6">Top Cast & Crew</Title>
+              <Title level={3} className="text-white mb-6">
+                Top Cast & Crew
+              </Title>
               <Row gutter={[16, 16]}>
                 {/* Director */}
                 <Col xs={24} sm={12} md={8}>
                   <div className="text-white">
                     <div className="text-sm text-gray-400 mb-2">Director</div>
                     <div className="font-semibold">
-                      {data?.main?.principalCreditsV2?.find(credit => credit.grouping.text === "Director")?.credits?.[0]?.name?.nameText?.text ||
-                        data?.short?.creator?.[0]?.name || 'Sam Raimi'}
+                      {data?.top?.principalCreditsV2?.find(
+                        (credit) => credit.grouping.text === "Director"
+                      )?.credits?.[0]?.name?.nameText?.text ||
+                        data?.short?.creator?.[0]?.name ||
+                        "Sam Raimi"}
                     </div>
                   </div>
                 </Col>
@@ -204,8 +221,11 @@ export default function ViewMovie() {
                   <div className="text-white">
                     <div className="text-sm text-gray-400 mb-2">Writers</div>
                     <div className="font-semibold">
-                      {data?.main?.principalCreditsV2?.find(credit => credit.grouping.text === "Writers")?.credits?.slice(0, 2).map(writer => writer.name?.nameText?.text).join(', ') ||
-                        'Stan Lee, Steve Ditko'}
+                      {data?.top?.principalCreditsV2
+                        ?.find((credit) => credit.grouping.text === "Writers")
+                        ?.credits?.slice(0, 2)
+                        .map((writer) => writer.name?.nameText?.text)
+                        .join(", ")}
                     </div>
                   </div>
                 </Col>
@@ -215,8 +235,11 @@ export default function ViewMovie() {
                   <div className="text-white">
                     <div className="text-sm text-gray-400 mb-2">Stars</div>
                     <div className="font-semibold">
-                      {data?.main?.principalCreditsV2?.find(credit => credit.grouping.text === "Stars")?.credits?.slice(0, 3).map(star => star.name?.nameText?.text).join(', ') ||
-                        'Tobey Maguire, Kirsten Dunst'}
+                      {data?.top?.principalCreditsV2
+                        ?.find((credit) => credit.grouping.text === "Stars")
+                        ?.credits?.slice(0, 3)
+                        .map((star) => star.name?.nameText?.text)
+                        .join(", ")}
                     </div>
                   </div>
                 </Col>
@@ -225,14 +248,16 @@ export default function ViewMovie() {
 
             {/* Box Office */}
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
-              <Title level={3} className="text-white mb-6">Box Office</Title>
+              <Title level={3} className="text-white mb-6">
+                Box Office
+              </Title>
               <Row gutter={[16, 16]}>
                 <Col xs={12} sm={6}>
                   <div className="text-white text-center">
                     <PiMoneyFill className="text-green-400 text-2xl mx-auto mb-2" />
                     <div className="text-sm text-gray-400">Budget</div>
                     <div className="font-semibold">
-                      ${(data?.main?.productionBudget?.budget?.amount / 1000000).toFixed(1)}M
+                      ${(data?.top?.productionBudget?.budget?.amount / 1000000).toFixed(1)}M
                     </div>
                   </div>
                 </Col>
@@ -241,7 +266,7 @@ export default function ViewMovie() {
                     <PiTrophyFill className="text-yellow-400 text-2xl mx-auto mb-2" />
                     <div className="text-sm text-gray-400">Worldwide</div>
                     <div className="font-semibold">
-                      ${(data?.main?.worldwideGross?.total?.amount / 1000000).toFixed(0)}M
+                      ${(data?.top?.worldwideGross?.total?.amount / 1000000).toFixed(0)}M
                     </div>
                   </div>
                 </Col>
@@ -250,7 +275,9 @@ export default function ViewMovie() {
                     <PiStarFill className="text-purple-400 text-2xl mx-auto mb-2" />
                     <div className="text-sm text-gray-400">Opening</div>
                     <div className="font-semibold">
-                      ${(data?.main?.openingWeekendGross?.gross?.total?.amount / 1000000).toFixed(1)}M
+                      $
+                      {(data?.top?.openingWeekendGross?.gross?.total?.amount / 1000000).toFixed(1)}
+                      M
                     </div>
                   </div>
                 </Col>
@@ -259,7 +286,7 @@ export default function ViewMovie() {
                     <PiChatCircleFill className="text-blue-400 text-2xl mx-auto mb-2" />
                     <div className="text-sm text-gray-400">Reviews</div>
                     <div className="font-semibold">
-                      {data?.main?.reviews?.total?.toLocaleString()}
+                      {data?.top?.reviews?.total?.toLocaleString()}
                     </div>
                   </div>
                 </Col>
@@ -271,11 +298,17 @@ export default function ViewMovie() {
           <Col xs={24} lg={8}>
             {/* Details */}
             <Card className="bg-white/10 backdrop-blur-md border-white/20 mb-6">
-              <Title level={4} className="text-white mb-4">Details</Title>
+              <Title level={4} className="text-white mb-4">
+                Details
+              </Title>
               <div className="space-y-3">
                 <div className="flex justify-between text-white">
                   <span className="text-gray-400">Release Date</span>
-                  <span>{new Date(data?.short?.datePublished || data?.main?.releaseDate?.year + '-05-03').toLocaleDateString()}</span>
+                  <span>
+                    {new Date(
+                      data?.short?.datePublished
+                    ).toLocaleDateString()}
+                  </span>
                 </div>
                 <div className="flex justify-between text-white">
                   <span className="text-gray-400">Country of Origin</span>
@@ -288,8 +321,10 @@ export default function ViewMovie() {
                 <div className="flex justify-between text-white">
                   <span className="text-gray-400">Production Companies</span>
                   <span className="text-right">
-                    {data?.main?.production?.edges?.slice(0, 2).map(company => company.company?.companyText?.text).join(', ') ||
-                      'Columbia Pictures, Marvel'}
+                    {data?.top?.production?.edges
+                      ?.slice(0, 2)
+                      .map((company) => company?.node?.company?.companyText?.text)
+                      .join(", ")}
                   </span>
                 </div>
               </div>
@@ -297,25 +332,31 @@ export default function ViewMovie() {
 
             {/* Did You Know */}
             <Card className="bg-white/10 backdrop-blur-md border-white/20 mb-6">
-              <Title level={4} className="text-white mb-4">Did You Know?</Title>
+              <Title level={4} className="text-white mb-4">
+                Did You Know?
+              </Title>
               <div className="text-gray-300 text-sm">
-                {data?.main?.trivia?.edges?.[0]?.node?.text?.plainText ||
-                  'The first film to gross $100 million in its opening weekend alone. At the time, no movie had done so, even when adjusted for inflation.'}
+                {data?.top?.trivia?.edges?.[0]?.node?.text?.plainText ||
+                  "The first film to gross $100 million in its opening weekend alone. At the time, no movie had done so, even when adjusted for inflation."}
               </div>
             </Card>
 
             {/* User Reviews */}
             <Card className="bg-white/10 backdrop-blur-md border-white/20">
-              <Title level={4} className="text-white mb-4">User Reviews</Title>
+              <Title level={4} className="text-white mb-4">
+                User Reviews
+              </Title>
               <div className="space-y-4">
-                {data?.main?.featuredReviews?.edges?.slice(0, 2).map((review, index) => (
+                {data?.top?.featuredReviews?.edges?.slice(0, 2).map((review, index) => (
                   <div key={index} className="text-white">
                     <div className="flex items-center gap-2 mb-2">
                       <Avatar size="small" className="bg-purple-600">
-                        {(review.node?.author?.username?.text || 'U')[0].toUpperCase()}
+                        {review.node?.author?.username?.text?.[0]?.toUpperCase()}
                       </Avatar>
                       <span className="font-semibold text-sm">
-                        {review.node?.author?.username?.text || review.node?.author?.nickName || 'User'}
+                        {review.node?.author?.username?.text ||
+                          review.node?.author?.nickName ||
+                          "User"}
                       </span>
                       {review.node?.authorRating && (
                         <div className="flex items-center gap-1 ml-auto">
@@ -325,10 +366,10 @@ export default function ViewMovie() {
                       )}
                     </div>
                     <div className="text-sm text-gray-300 mb-1">
-                      {review.node?.summary?.originalText || 'Great movie!'}
+                      {review.node?.summary?.originalText}
                     </div>
                     <div className="text-xs text-gray-400 line-clamp-2">
-                      {(review.node?.text?.originalText || review.node?.text?.plainText || 'Excellent movie with great performances.').replace(/<[^>]*>/g, '')}
+                      {review.node?.text?.originalText?.originalText || review.node?.text?.originalText?.plainText}
                     </div>
                   </div>
                 ))}

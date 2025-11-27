@@ -18,7 +18,7 @@ export default function Movies() {
 
   const fetchData = async () => {
     const { response, status } = await callApi({
-      url: "/search",
+      url: "/api/search",
       method: "get",
       params: {
         q: searchQuery,
